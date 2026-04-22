@@ -1,3 +1,6 @@
+const weatherAPIkey = "5cd419f6c65fed0b2fc0cb5db588f2f6";
+const weatherAPIURL = `https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}&units=metric`;
+
 const galleryImages = [
     {
         src: "./assets/gallery/image1.jpg",
@@ -83,23 +86,41 @@ function greetingHandler() {
         greetingText = "Welcome!";
     }
 
-    const weatherCondition = "sunny";
-    const userLocation = "Rio de Janerio";
-    let temperature = 30;
-
-    let celsiusText = `The weather is ${weatherCondition} in ${userLocation} and it's ${temperature.toFixed(1)}°C outside.`;
-    let fahrText = `The weather is ${weatherCondition} in ${userLocation} and it's ${celsiusToFahr(temperature).toFixed(1)}°F outside.`;
-
     document.querySelector("#greeting").innerHTML = greetingText;
-    document.querySelector("#weather").innerHTML = celsiusText;
+}
 
-    // Temperature switch
-    document.querySelector(".weather-group").addEventListener("click", function (e) {
-        if (e.target.id == "celsius") {
-            document.querySelector("#weather").innerHTML = celsiusText;
-        } else if (e.target.id == "fahr") {
-            document.querySelector("#weather").innerHTML = fahrText;
-        }
+// Weather Section
+function weatherHandler() {
+    navigator.geolocation.getCurrentPosition(position => {
+        let latitude = position.coords.latitude;
+        let longitude = position.coords.longitude;
+        let url = weatherAPIURL
+            .replace("{lat}", latitude)
+            .replace("{lon}", longitude)
+            .replace("{API key}", weatherAPIkey);
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const condition = data.weather[0].description;
+                const location = data.name;
+                let temperature = data.main.temp;
+
+                let celsiusText = `The weather is ${condition} in ${location} and it's ${temperature.toFixed(1)}°C outside.`;
+                let fahrText = `The weather is ${condition} in ${location} and it's ${celsiusToFahr(temperature.toFixed(1))}°F outside.`;
+
+                document.querySelector("#weather").innerHTML = celsiusText;
+
+                // Temperature switch
+                document.querySelector(".weather-group").addEventListener("click", function (e) {
+                    if (e.target.id == "celsius") {
+                        document.querySelector("#weather").innerHTML = celsiusText;
+                    } else if (e.target.id == "fahr") {
+                        document.querySelector("#weather").innerHTML = fahrText;
+                    }
+                });
+            }).catch((err => {
+                document.querySelector("#weather").innerHTML = "Unable to get the weather info. Try again later.";
+            }));
     });
 }
 
@@ -147,7 +168,7 @@ function galleryHandler() {
 }
 
 // Products Section
-function populateProducts(productList){
+function populateProducts(productList) {
     let productsSection = document.querySelector(".products-area");
     productsSection.textContent = "";
 
@@ -200,12 +221,8 @@ function populateProducts(productList){
 }
 
 function productsHandler() {
-    let freeProducts = products.filter(function (item) {
-        return !item.price || item.price <= 0;
-    });
-    let paidProducts = products.filter(item => {
-        return item.price > 0;
-    });
+    let freeProducts = products.filter(item => !item.price || item.price <= 0);
+    let paidProducts = products.filter(item => item.price > 0);
 
     populateProducts(products);
 
@@ -215,23 +232,21 @@ function productsHandler() {
 
     let productsFilter = document.querySelector(".products-filter");
 
-    productsFilter.addEventListener("click", function(e){
-        if (e.target.id === "all"){
+    productsFilter.addEventListener("click", function (e) {
+        if (e.target.id === "all") {
             populateProducts(products);
-        } else if(e.target.id === "paid"){
+        } else if (e.target.id === "paid") {
             populateProducts(paidProducts);
-        } else if (e.target.id === "free"){
+        } else if (e.target.id === "free") {
             populateProducts(freeProducts);
         }
     });
 }
 
-function footerHandler(){
+function footerHandler() {
     let currentYear = new Date().getFullYear();
-    document.querySelector("footer").textContent = `© ${currentYear} - All rights reserved`
-
+    document.querySelector("footer").textContent = `© ${currentYear} - All rights reserved`;
 }
-
 
 // Page Load
 menuHandler();
@@ -240,3 +255,4 @@ clockHandler();
 galleryHandler();
 productsHandler();
 footerHandler();
+weatherHandler();
