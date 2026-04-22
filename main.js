@@ -15,56 +15,56 @@ const galleryImages = [
 
 const products = [
     {
-      title: "AstroFiction",
-      author: "John Doe",
-      price: 49.9,
-      image: "./assets/products/img6.png"
+        title: "AstroFiction",
+        author: "John Doe",
+        price: 49.9,
+        image: "./assets/products/img6.png"
     },
     {
-      title: "Space Odissey",
-      author: "Marie Anne",
-      price: 35,
-      image: "./assets/products/img1.png"
+        title: "Space Odissey",
+        author: "Marie Anne",
+        price: 35,
+        image: "./assets/products/img1.png"
     },
     {
-      title: "Doomed City",
-      author: "Jason Cobert",
-      price: 0,
-      image: "./assets/products/img2.png"
+        title: "Doomed City",
+        author: "Jason Cobert",
+        price: 0,
+        image: "./assets/products/img2.png"
     },
     {
-      title: "Black Dog",
-      author: "John Doe",
-      price: 85.35,
-      image: "./assets/products/img3.png"
+        title: "Black Dog",
+        author: "John Doe",
+        price: 85.35,
+        image: "./assets/products/img3.png"
     },
     {
-      title: "My Little Robot",
-      author: "Pedro Paulo",
-      price: 0,
-      image: "./assets/products/img5.png"
+        title: "My Little Robot",
+        author: "Pedro Paulo",
+        price: 0,
+        image: "./assets/products/img5.png"
     },
     {
-      title: "Garden Girl",
-      author: "Ankit Patel",
-      price: 45,
-      image: "./assets/products/img4.png"
+        title: "Garden Girl",
+        author: "Ankit Patel",
+        price: 45,
+        image: "./assets/products/img4.png"
     }
-  ];
+];
 
 // Menu Section
-function menuHandler(){
-    document.querySelector("#open-nav-menu").addEventListener("click", function(){
+function menuHandler() {
+    document.querySelector("#open-nav-menu").addEventListener("click", function () {
         document.querySelector("header nav .wrapper").classList.add("nav-open");
     });
 
-    document.querySelector("#close-nav-menu").addEventListener("click", function(){
+    document.querySelector("#close-nav-menu").addEventListener("click", function () {
         document.querySelector("header nav .wrapper").classList.remove("nav-open");
     });
 }
 
-function celsiusToFahr(temperature){
-    let fahr = (temperature * 9/5) + 32;
+function celsiusToFahr(temperature) {
+    let fahr = (temperature * 9 / 5) + 32;
     return fahr;
 }
 
@@ -102,7 +102,7 @@ function greetingHandler() {
         }
     });
 }
-    
+
 // Local Time Selection
 function clockHandler() {
     setInterval(function () {
@@ -147,17 +147,89 @@ function galleryHandler() {
 }
 
 // Products Section
-        //   <div class="product-item">
-        //      <img src="./assets/products/img6.png" alt="AstroFiction">
-        //      <div class="product-details">
-        //         <h3 class="product-title">AstroFiction</h3>
-        //         <p class="product-author">John Doe</p>
-        //         <p class="price-title">Price</p>
-        //         <p class="product-price">$ 49.90</p>
-        //      </div>
-        //   </div>
+function populateProducts(productList){
+    let productsSection = document.querySelector(".products-area");
+    productsSection.textContent = "";
 
-function productsHandler(){
+    // Run a loop through the products and create an HTML element ("product-item") for each of the item
+    productList.forEach(function (product, index) {
+        // Create the HTML element for the indiviual product
+        let productElement = document.createElement("div");
+        productElement.classList.add("product-item");
+
+        //Create the product image
+        let productImage = document.createElement("img");
+        productImage.src = product.image;
+        productImage.alt = "Image for " + product.title;
+
+        // create the product details section
+        let productDetails = document.createElement("div");
+        productDetails.classList.add("product-details")
+
+        // Create product title, author, price-title and price
+        let productTitle = document.createElement("h3");
+        productTitle.classList.add("productTitle");
+        productTitle.textContent = product.title;
+
+        let productAuthor = document.createElement("p");
+        productAuthor.classList.add("product-author");
+        productAuthor.textContent = product.author;
+
+        let priceTitle = document.createElement("p");
+        priceTitle.classList.add("product-author");
+        priceTitle.textContent = "Price";
+
+        let productPrice = document.createElement("p");
+        productPrice.classList.add("product-price");
+        productPrice.textContent = product.price > 0 ? "$" + product.price.toFixed(2) : "Free";
+
+
+        // Append the product details
+        productDetails.append(productTitle);
+        productDetails.append(productAuthor);
+        productDetails.append(priceTitle);
+        productDetails.append(productPrice);
+
+        // Add all child HTML of the product
+        productElement.append(productImage);
+        productElement.append(productDetails);
+
+        // Add the complete individual product to the products section
+        productsSection.appendChild(productElement);
+    });
+}
+
+function productsHandler() {
+    let freeProducts = products.filter(function (item) {
+        return !item.price || item.price <= 0;
+    });
+    let paidProducts = products.filter(item => {
+        return item.price > 0;
+    });
+
+    populateProducts(products);
+
+    document.querySelector(".products-filter label[for=all] span.product-amount").textContent = products.length;
+    document.querySelector(".products-filter label[for=paid] span.product-amount").textContent = paidProducts.length;
+    document.querySelector(".products-filter label[for=free] span.product-amount").textContent = freeProducts.length;
+
+    let productsFilter = document.querySelector(".products-filter");
+
+    productsFilter.addEventListener("click", function(e){
+        if (e.target.id === "all"){
+            populateProducts(products);
+        } else if(e.target.id === "paid"){
+            populateProducts(paidProducts);
+        } else if (e.target.id === "free"){
+            populateProducts(freeProducts);
+        }
+    });
+}
+
+function footerHandler(){
+    let currentYear = new Date().getFullYear();
+    document.querySelector("footer").textContent = `© ${currentYear} - All rights reserved`
+
 }
 
 
@@ -167,3 +239,4 @@ greetingHandler();
 clockHandler();
 galleryHandler();
 productsHandler();
+footerHandler();
